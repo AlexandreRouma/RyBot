@@ -1,0 +1,5 @@
+{
+    "eslint.enable": true,
+    "editor.tabSize": 4,
+    "eslint.trace.server": "messages"
+}
