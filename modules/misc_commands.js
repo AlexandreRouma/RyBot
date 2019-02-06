@@ -7,6 +7,10 @@ const moment = require('moment');
 const momentDurationFormatSetup = require('moment-duration-format');
 const mathEval = require('math-expression-evaluator');
 
+// Require Eris for synthax highlight
+// eslint-disable-next-line no-unused-vars
+const Eris = require('eris');
+
 module.exports._mod_info = {
     name: 'misc_commands',
     description: 'Misc commands for RyBot',
@@ -251,5 +255,64 @@ module.exports.random = {
         else {
             message.channel.createMessage(`:no_entry: \`Invalid number!\``);
         }
+    }
+};
+
+module.exports.avatar = {
+    name: 'avatar',
+    usage: 'avatar [user]',
+    description: 'Get a user\'s avatar',
+    alias: 'pfp',
+    adminOnly: false,
+    ownerOnly: false,
+    /**
+     * @param {Eris.Client} bot Text channel
+     * @param {Eris.Message} message Discord message
+     * @param {Eris.Message} text Text after the command
+     * @param {string[]} args Discord message
+     */
+    baseCmd: async (bot, message, text, args) => {
+        let mentions = message.mentions;
+        if (mentions.length < 1) {
+            modHelper.modules['misc_commands']._help(message.channel, module.exports.avatar);
+            return;
+        }
+        let content = '';
+        for (let i = 0; i < mentions.length; i++) {
+            let member = message.channel.guild.members.get(mentions[i].id);
+            content += `${member.avatarURL.split('?')[0]}\n`;
+        }
+        message.channel.createMessage(content);
+    }
+};
+
+module.exports.serverinfo = {
+    name: 'serverinfo',
+    usage: 'serverinfo',
+    description: 'Get information about the server',
+    adminOnly: false,
+    ownerOnly: false,
+    /**
+     * @param {Eris.Client} bot Text channel
+     * @param {Eris.Message} message Discord message
+     * @param {Eris.Message} text Text after the command
+     * @param {string[]} args Discord message
+     */
+    baseCmd: async (bot, message, text, args) => {
+        let conf = await config.get(message.channel.guild.id);
+        let guild = message.channel.guild;
+        let embed = new embedBuilder.Embed();
+        embed.setColor(conf.embedColor);
+        embed.setThumbnail(guild.iconURL);
+        embed.setAuthor(guild.name, undefined, guild.iconURL);
+        embed.addField('Member count', guild.memberCount, true);
+        embed.addField('Region', guild.region, true);
+        embed.addField('Created at', new Date(guild.createdAt).toUTCString(), true);
+        embed.addField('Bot joined at', new Date(guild.joinedAt).toUTCString(), true);
+        embed.setFooter(`Server ID: ${guild.id}`);
+        embed.setDescription('Placeholder');
+        message.channel.createMessage({
+            embed: embed.get()
+        });
     }
 };

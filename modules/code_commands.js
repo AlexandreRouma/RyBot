@@ -4,6 +4,10 @@ const modHelper = require('../modHelper');
 const embedBuilder = require('../embedBuilder');
 const fs = require('fs');
 
+// Require Eris for synthax highlight
+// eslint-disable-next-line no-unused-vars
+const Eris = require('eris');
+
 module.exports._mod_info = {
     name: 'code_commands',
     description: 'Code commands for RyBot',

@@ -2,6 +2,10 @@ const logger = require('../logger');
 const config = require('../config');
 const modHelper = require('../modHelper');
 
+// Require Eris for synthax highlight
+// eslint-disable-next-line no-unused-vars
+const Eris = require('eris');
+
 module.exports._mod_info = {
     name: 'admin_commands',
     description: 'Admin commands for RyBot',

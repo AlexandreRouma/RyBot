@@ -1,6 +1,10 @@
 const logger = require('../logger');
 const modHelper = require('../modHelper');
 
+// Require Eris for synthax highlight
+// eslint-disable-next-line no-unused-vars
+const Eris = require('eris');
+
 module.exports._mod_info = {
     name: 'owner_commands',
     description: 'Owber commands for RyBot',
@@ -34,28 +38,5 @@ module.exports.reload = {
     baseCmd: async (bot, message, text, args) => {
         modHelper.reload(bot);
         message.channel.createMessage(`:white_check_mark: \`Reloaded modules successfully!\``);
-    }
-};
-
-module.exports.module = {
-    name: 'module',
-    usage: 'module [list/name]',
-    description: 'Get info about the loaded modules',
-    adminOnly: false,
-    ownerOnly: false,
-    /**
-     * @param {Eris.Client} bot Text channel
-     * @param {Eris.Message} message Discord message
-     * @param {Eris.Message} text Text after the command
-     * @param {string[]} args Discord message
-     */
-    baseCmd: async (bot, message, text, args) => {
-        modHelper.reload(bot);
-        message.channel.createMessage(`:white_check_mark: \`Modules successfully!\``);
-    },
-    subCmds: {
-        list: async (bot, message, text, args) => {
-            // TODO: Finish this thing
-        }
     }
 };

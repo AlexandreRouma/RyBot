@@ -6,6 +6,9 @@ const modHelper = require('../modHelper');
 const embedBuilder = require('../embedBuilder');
 const moment = require('moment');
 const momentDurationFormatSetup = require('moment-duration-format');
+
+// Require Eris for synthax highlight
+// eslint-disable-next-line no-unused-vars
 const Eris = require('eris');
 
 let playlist = {};

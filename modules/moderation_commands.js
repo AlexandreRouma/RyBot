@@ -3,6 +3,10 @@ const config = require('../config');
 const modHelper = require('../modHelper');
 const embedBuilder = require('../embedBuilder');
 
+// Require Eris for synthax highlight
+// eslint-disable-next-line no-unused-vars
+const Eris = require('eris');
+
 module.exports._mod_info = {
     name: 'moderation_commands',
     description: 'Moder a commands for RyBot',
@@ -261,7 +265,7 @@ module.exports.unmute = {
         let mentions = message.mentions;
         let conf = await config.get(message.channel.guild.id);
         if (mentions.length < 1) {
-            modHelper.modules['misc_commands']._help(message.channel, module.exports.mute);
+            modHelper.modules['misc_commands']._help(message.channel, module.exports.unmute);
             return;
         }
 
@@ -298,7 +302,7 @@ module.exports.userinfo = {
         let conf = await config.get(message.channel.guild.id);
         let mentions = message.mentions;
         if (mentions.length < 1) {
-            modHelper.modules['misc_commands']._help(message.channel, module.exports.softban);
+            modHelper.modules['misc_commands']._help(message.channel, module.exports.userinfo);
             return;
         }
         message.channel.guild.fetchAllMembers();
