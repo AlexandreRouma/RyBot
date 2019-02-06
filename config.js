@@ -6,6 +6,7 @@ const DEFAULT_GLOBAL = {
     modules: '',
     botOwner: '274976585650536449',
     tempPunishmentCheckInterval: 60000,
+    status: '',
 };
 
 const DEFAULT_SERVER = {

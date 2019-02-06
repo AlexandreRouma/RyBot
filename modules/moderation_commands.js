@@ -12,6 +12,7 @@ const PUNISHMENTS_DEFAULT = {
 };
 
 let eris_bot = {};
+let workerId = {};
 
 module.exports._mod_info = {
     name: 'moderation_commands',
@@ -23,13 +24,13 @@ module.exports._mod_init = (bot) => {
     logger.log(`Initializing moderation_commands...`);
     eris_bot = bot;
     handleTempPunishments();
-    setInterval(handleTempPunishments, config.getGlobal().tempPunishmentCheckInterval);
+    workerId = setInterval(handleTempPunishments, config.getGlobal().tempPunishmentCheckInterval);
     logger.ok();
 };
 
 module.exports._mod_end = (bot) => {
     logger.log(`Stopping moderation_commands...`);
-    // TODO: Add shit idk
+    clearInterval(workerId);
     logger.ok();
 };
 
@@ -300,7 +301,7 @@ module.exports.setmuted = {
 
 module.exports.mute = {
     name: 'mute',
-    usage: 'mute [user]',
+    usage: 'mute [user] ([duration][m/h/d/M/y])',
     description: 'Mute a user',
     adminOnly: true,
     ownerOnly: false,
