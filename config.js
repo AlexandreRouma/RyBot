@@ -4,7 +4,8 @@ const Sequelize = require('sequelize');
 const DEFAULT_GLOBAL = {
     token: '',
     modules: '',
-    botOwner: '274976585650536449'
+    botOwner: '274976585650536449',
+    tempPunishmentCheckInterval: 60000,
 };
 
 const DEFAULT_SERVER = {
@@ -106,6 +107,42 @@ module.exports.set = async (server, config) => {
     {
         where: {
             serverId: server
+        }
+    });
+};
+
+async function addOther(entry, def) {
+    await sconfig.create({
+        serverId: entry,
+        config: JSON.stringify(def)
+    });
+}
+
+module.exports.getOther = async (entry, def = {}) => {
+    let _data = await sconfig.findOne({
+        where: {
+            serverId: entry
+        }
+    });
+    if (_data == null) {
+        addOther(entry, def);
+        return def;
+    }
+    let data = JSON.parse(_data.get('config'));
+    if (Object.keys(data).length != Object.keys(def).length) {
+        data = migrate(data, def);
+        module.exports.set(entry, data);
+    }
+    return data;
+};
+
+module.exports.setOther = async (entry, data) => {
+    await sconfig.update({
+        config: JSON.stringify(data)
+    },
+    {
+        where: {
+            serverId: entry
         }
     });
 };

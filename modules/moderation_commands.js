@@ -7,6 +7,12 @@ const embedBuilder = require('../embedBuilder');
 // eslint-disable-next-line no-unused-vars
 const Eris = require('eris');
 
+const PUNISHMENTS_DEFAULT = {
+    list: {}
+};
+
+let eris_bot = {};
+
 module.exports._mod_info = {
     name: 'moderation_commands',
     description: 'Moder a commands for RyBot',
@@ -15,7 +21,9 @@ module.exports._mod_info = {
 
 module.exports._mod_init = (bot) => {
     logger.log(`Initializing moderation_commands...`);
-    // TODO: Add shit idk
+    eris_bot = bot;
+    handleTempPunishments();
+    setInterval(handleTempPunishments, config.getGlobal().tempPunishmentCheckInterval);
     logger.ok();
 };
 
@@ -24,6 +32,45 @@ module.exports._mod_end = (bot) => {
     // TODO: Add shit idk
     logger.ok();
 };
+
+async function handleTempPunishments() {
+    let punishments = await config.getOther('punishments', PUNISHMENTS_DEFAULT);
+    let IDs = Object.keys(punishments.list);
+    let now = Date.now();
+    for (let i = 0; i < IDs.length; i++) {
+        let punish = punishments.list[IDs[i]];
+        if (new Date(punish.expiry) < now) {
+            let id = IDs[i].split('_');
+            let memberId = id[0];
+            let serverId = id[1];
+            let conf = await config.get(serverId);
+            if (punish.type == 'tempmute') {
+                try {
+                    eris_bot.removeGuildMemberRole(serverId, memberId, conf.mutedRole, 'automatic unmute');
+                }
+                catch (err) {
+                    logger.logWarn(`Could not unmute ${punish.member.username}#${punish.member.discriminator} on '${punish.server.name}'.`);
+                }
+            }
+            else if (punish.type == 'tempban') {
+                try {
+                    eris_bot.unbanGuildMember(serverId, memberId, 'automatic unban');
+                }
+                catch (err) {
+                    logger.logWarn(`Could not unmute ${punish.member.username}#${punish.member.discriminator} on '${punish.server.name}'.`);
+                }
+            }
+            delete punishments.list[IDs[i]];
+        }
+    }
+    config.setOther('punishments', punishments);
+}
+
+async function addTempPunishment(memberId, serverId, punishment) {
+    let punishments = await config.getOther('punishments', PUNISHMENTS_DEFAULT);
+    punishments.list[`${memberId}_${serverId}`] = punishment;
+    config.setOther('punishments', punishments);
+}
 
 module.exports.kick = {
     name: 'kick',
@@ -62,7 +109,7 @@ module.exports.kick = {
 
 module.exports.ban = {
     name: 'ban',
-    usage: 'ban [user]',
+    usage: 'ban [user] ([duration][m/h/d/M/y])',
     description: 'Ban a user from the server',
     adminOnly: true,
     ownerOnly: false,
@@ -74,11 +121,49 @@ module.exports.ban = {
      */
     baseCmd: async (bot, message, text, args) => {
         let mentions = message.mentions;
+        let duration = '0';
+        let unit = 'm';
         if (mentions.length < 1) {
             modHelper.modules['misc_commands']._help(message.channel, module.exports.ban);
             return;
         }
+        for (let i = 1; i < args.length; i++) {
+            if (args[i].endsWith('m') || args[i].endsWith('h') || args[i].endsWith('d') || args[i].endsWith('M') || args[i].endsWith('y')) {
+                duration = args[i].substring(0, args[i].length - 1);
+                unit = args[i][args[i].length - 1];
+                break;
+            }
+        }
         for (let i = 0; i < mentions.length; i++) {
+            if (!/^\d+$/.test(duration)) {
+                message.channel.createMessage(`:no_entry: \`Invalid duration\``);
+                return;
+            }
+            else if (Number.parseInt(duration) != 0) {
+                let expiry = new Date();
+                let dur = Number.parseInt(duration);
+                if (unit == 'm') {
+                    expiry.setMinutes(expiry.getMinutes() + dur);
+                }
+                if (unit == 'h') {
+                    expiry.setHours(expiry.getHours() + dur);
+                }
+                if (unit == 'd') {
+                    expiry.setDate(expiry.getDate() + dur);
+                }
+                if (unit == 'M') {
+                    expiry.setMonth(expiry.getMonth() + dur);
+                }
+                if (unit == 'y') {
+                    expiry.setFullYear(expiry.getMinutes() + dur);
+                }
+                addTempPunishment(message.member.id, message.channel.guild.id, {
+                    type: 'tempban',
+                    expiry: expiry,
+                    server: message.channel.guild,
+                    member: mentions[i].id
+                });
+            }
             try {
                 await bot.banGuildMember(message.channel.guild.id, mentions[i].id, 7, `Banned by ${message.author.username}#${message.author.discriminator}`);
             }
@@ -227,12 +312,50 @@ module.exports.mute = {
      */
     baseCmd: async (bot, message, text, args) => {
         let mentions = message.mentions;
+        let duration = '0';
+        let unit = 'm';
         let conf = await config.get(message.channel.guild.id);
         if (mentions.length < 1) {
             modHelper.modules['misc_commands']._help(message.channel, module.exports.mute);
             return;
         }
+        for (let i = 1; i < args.length; i++) {
+            if (args[i].endsWith('m') || args[i].endsWith('h') || args[i].endsWith('d') || args[i].endsWith('M') || args[i].endsWith('y')) {
+                duration = args[i].substring(0, args[i].length - 1);
+                unit = args[i][args[i].length - 1];
+                break;
+            }
+        }
         for (let i = 0; i < mentions.length; i++) {
+            if (!/^\d+$/.test(duration)) {
+                message.channel.createMessage(`:no_entry: \`Invalid duration\``);
+                return;
+            }
+            else if (Number.parseInt(duration) != 0) {
+                let expiry = new Date();
+                let dur = Number.parseInt(duration);
+                if (unit == 'm') {
+                    expiry.setMinutes(expiry.getMinutes() + dur);
+                }
+                if (unit == 'h') {
+                    expiry.setHours(expiry.getHours() + dur);
+                }
+                if (unit == 'd') {
+                    expiry.setDate(expiry.getDate() + dur);
+                }
+                if (unit == 'M') {
+                    expiry.setMonth(expiry.getMonth() + dur);
+                }
+                if (unit == 'y') {
+                    expiry.setFullYear(expiry.getMinutes() + dur);
+                }
+                addTempPunishment(message.member.id, message.channel.guild.id, {
+                    type: 'tempmute',
+                    expiry: expiry,
+                    server: message.channel.guild,
+                    member: mentions[i].id
+                });
+            }
             try {
                 await message.channel.guild.addMemberRole(mentions[i].id, conf.mutedRole);
             }
