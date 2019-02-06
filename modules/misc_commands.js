@@ -310,7 +310,6 @@ module.exports.serverinfo = {
         embed.addField('Created at', new Date(guild.createdAt).toUTCString(), true);
         embed.addField('Bot joined at', new Date(guild.joinedAt).toUTCString(), true);
         embed.setFooter(`Server ID: ${guild.id}`);
-        embed.setDescription('Placeholder');
         message.channel.createMessage({
             embed: embed.get()
         });
