@@ -87,7 +87,7 @@ module.exports.module = {
      */
     baseCmd: async (bot, message, text, args) => {
         if (args.length < 2) {
-            modHelper.modules['misc_commands']._help(message.channel, module.exports.setcolor);
+            modHelper.modules['misc_commands']._help(message.channel, module.exports.module);
             return;
         }
         message.channel.createMessage(`:no-entry: \`Unknown subcommand: ${args[1]}\``);
