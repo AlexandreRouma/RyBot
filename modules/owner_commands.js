@@ -78,7 +78,7 @@ module.exports.module = {
     usage: 'module [list/info] [name]',
     description: 'List modules or get info about one',
     adminOnly: false,
-    ownerOnly: true,
+    ownerOnly: false,
     /**
      * @param {Eris.Client} bot Text channel
      * @param {Eris.Message} message Discord message
