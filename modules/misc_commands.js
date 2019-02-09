@@ -106,6 +106,24 @@ module.exports.help = {
     }
 };
 
+module.exports.commandlist = {
+    name: 'commandlist',
+    usage: 'commandlist',
+    description: 'Get the complete list of commands',
+    alias: 'cmdlist',
+    adminOnly: false,
+    ownerOnly: false,
+    /**
+     * @param {Eris.Client} bot Text channel
+     * @param {Eris.Message} message Discord message
+     * @param {Eris.Message} text Text after the command
+     * @param {string[]} args Discord message
+     */
+    baseCmd: async (bot, message, text, args) => {
+        message.channel.createMessage(modHelper.helpLink);
+    }
+};
+
 module.exports.atsomeone = {
     name: 'atsomeone',
     alias: '@someone',

@@ -1,9 +1,14 @@
 const config = require('./config');
 const logger = require('./logger');
 const fs = require('fs');
+const https = require('https');
 
 module.exports.modules = {};
 module.exports.commands = {};
+module.exports.markdownHelp = '';
+module.exports.helpLink = '';
+
+let workerId = null;
 
 module.exports.check = (mod) => {
     if (!mod._mod_init || !mod._mod_end || !mod._mod_info) {
@@ -77,7 +82,22 @@ module.exports.load = (bot) => {
         totalMod++;
     }
     logger.logInfo(`Loaded a total ${totalCmd} commands from ${totalMod} modules.`);
+    logger.log('Generating help file...');
+    module.exports.markdownHelp = module.exports.getMarkdownHelp();
+    fs.writeFileSync('HELP.md', module.exports.markdownHelp);
+    updateHelpLink();
+    if (workerId != null) {
+        clearInterval(workerId);
+    }
+    workerId = setInterval(updateHelpLink, config.getGlobal().helpLinkRefresh * 1000);
+    logger.ok();
 };
+
+function updateHelpLink() {
+    hastebin(module.exports.markdownHelp, (key) => {
+        module.exports.helpLink = `https://hastebin.com/${key}.md`;
+    });
+}
 
 module.exports.reload = (bot) => {
     logger.logInfo('Module reload triggered!');
@@ -143,3 +163,29 @@ module.exports.getMarkdownHelp = () => {
     }
     return str;
 };
+
+function hastebin(text, callback) {
+    const options = {
+        hostname: 'hastebin.com',
+        port: 443,
+        path: '/documents',
+        method: 'post',
+        headers: {
+            'Content-Length': text.length
+        }
+    };
+    const req = https.request(options, (res) => {
+        let data = '';
+        res.on('data', (d) => {
+            data += d;
+        });
+        res.on('end', (d) => {
+            callback(JSON.parse(data).key);
+        });
+    });
+    req.on('error', (e) => {
+        console.error(e);
+    });
+    req.write(text);
+    req.end();
+}

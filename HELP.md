@@ -12,6 +12,7 @@
 | ping          |          | ping                                | No    | No    | Test the bot                                        |
 | uptime        |          | uptime                              | No    | No    | Get the bot's uptime                                |
 | help          |          | help [command]                      | No    | No    | Get help about a command                            |
+| commandlist   | cmdlist  | commandlist                         | No    | No    | Get the complete list of commands                   |
 | atsomeone     | @someone | atsomeone [role]                    | No    | No    | At someone                                          |
 | demo          |          | demo                                | No    | No    | Demo for my embed builder                           |
 | specialthanks | spthx    | specialthanks                       | No    | No    | People that helped the development of the bot       |
@@ -35,4 +36,4 @@
 | userinfo      |          | userinfo [user]                     | No    | No    | Get information about a user                        |
 | reload        |          | reload                              | No    | Yes   | Reload the bot's modules                            |
 | setstatus     |          | setstatus [text]                    | No    | Yes   | Set the bot's status                                |
-| module        |          | module [list/info] [name]           | No    | Yes   | List modules or get info about one                  |
+| module        |          | module [list/info] [name]           | No    | No    | List modules or get info about one                  |

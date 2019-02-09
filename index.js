@@ -54,11 +54,6 @@ async function main() {
     // Load modules
     modHelper.load(bot);
 
-    // Generate help file
-    logger.log('Generating help file...');
-    fs.writeFileSync('HELP.md', modHelper.getMarkdownHelp());
-    logger.ok();
-
     // Handlers
     logger.log('Starting handlers...');
     bot.on('messageCreate', async (message) => {

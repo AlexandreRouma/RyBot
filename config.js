@@ -5,7 +5,7 @@ const DEFAULT_GLOBAL = {
     token: '',
     modules: '',
     botOwner: '274976585650536449',
-    tempPunishmentCheckInterval: 60000,
+    helpLinkRefresh: 86400,
     status: '',
 };
 
