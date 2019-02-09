@@ -6,6 +6,7 @@ const embedBuilder = require('../embedBuilder');
 const moment = require('moment');
 const momentDurationFormatSetup = require('moment-duration-format');
 const mathEval = require('math-expression-evaluator');
+const aesthetics = require('aesthetics');
 
 // Require Eris for synthax highlight
 // eslint-disable-next-line no-unused-vars
@@ -185,8 +186,8 @@ module.exports.specialthanks = {
 
 module.exports.say = {
     name: 'say',
-    usage: 'say',
-    description: 'Quotes something',
+    usage: 'say [text]',
+    description: 'Say something',
     adminOnly: false,
     ownerOnly: false,
     /**
@@ -196,6 +197,10 @@ module.exports.say = {
      * @param {string[]} args Discord message
      */
     baseCmd: async (bot, message, text, args) => {
+        if (args.length < 2) {
+            message.channel.createMessage(`:no_entry: \`No text supplied!\``);
+            return;
+        }
         bot.createMessage(message.channel.id, `\`\`\`${text}\`\`\``);
     }
 };
@@ -203,7 +208,7 @@ module.exports.say = {
 module.exports.calculate = {
     name: 'calculate',
     usage: 'calculate',
-    description: 'Returns the value for a math expression',
+    description: 'Return the value for a math expression',
     alias: 'calc',
     adminOnly: false,
     ownerOnly: false,
@@ -313,5 +318,134 @@ module.exports.serverinfo = {
         message.channel.createMessage({
             embed: embed.get()
         });
+    }
+};
+
+module.exports.aesthetics = {
+    name: 'aesthetics',
+    usage: 'aesthetics [text]',
+    description: 'Make text ａｅｓｔｈｅｔｉｃ',
+    alias: 'vapwav',
+    adminOnly: false,
+    ownerOnly: false,
+    /**
+     * @param {Eris.Client} bot Text channel
+     * @param {Eris.Message} message Discord message
+     * @param {Eris.Message} text Text after the command
+     * @param {string[]} args Discord message
+     */
+    baseCmd: async (bot, message, text, args) => {
+        if (args.length < 2) {
+            message.channel.createMessage(`:no_entry: \`No text supplied!\``);
+            return;
+        }
+        bot.createMessage(message.channel.id, `\`\`\`${aesthetics(text)}\`\`\``);
+    }
+};
+
+module.exports.mock = {
+    name: 'mock',
+    usage: 'mock [text]',
+    description: 'Mock some text',
+    adminOnly: false,
+    ownerOnly: false,
+    /**
+     * @param {Eris.Client} bot Text channel
+     * @param {Eris.Message} message Discord message
+     * @param {Eris.Message} text Text after the command
+     * @param {string[]} args Discord message
+     */
+    baseCmd: async (bot, message, text, args) => {
+        if (args.length < 2) {
+            message.channel.createMessage(`:no_entry: \`No text supplied!\``);
+            return;
+        }
+        let str = '';
+        for (var i = 0; i < text.length; i++) {
+            if (Math.random() >= 0.5) {
+                str += text[i].toUpperCase();
+            }
+            else {
+                str += text[i];
+            }
+        }
+        bot.createMessage(message.channel.id, `\`\`\`${str}\`\`\``);
+    }
+};
+
+var leetspeak = {
+    'a': '4',
+    'e': '3',
+    'i': '1',
+    'l': '1',
+    'o': '0',
+    's': '5',
+    't': '7',
+    'z': '2',
+};
+
+module.exports.leetspeak = {
+    name: 'leetspeak',
+    usage: 'leetspeak [text]',
+    description: 'Make text ａｅｓｔｈｅｔｉｃ',
+    alias: 'leet',
+    adminOnly: false,
+    ownerOnly: false,
+    /**
+     * @param {Eris.Client} bot Text channel
+     * @param {Eris.Message} message Discord message
+     * @param {Eris.Message} text Text after the command
+     * @param {string[]} args Discord message
+     */
+    baseCmd: async (bot, message, text, args) => {
+        if (args.length < 2) {
+            message.channel.createMessage(`:no_entry: \`No text supplied!\``);
+            return;
+        }
+        let str = '';
+        for (let i = 0; i < text.length; i++) {
+            str += leetspeak[text[i]] || text[i];
+        }
+        bot.createMessage(message.channel.id, `\`\`\`${str}\`\`\``);
+    }
+};
+
+module.exports.whatsmytoken = {
+    name: 'whatsmytoken',
+    usage: 'whatsmytoken',
+    description: 'Get your discord token',
+    alias: 'token',
+    adminOnly: false,
+    ownerOnly: false,
+    /**
+     * @param {Eris.Client} bot Text channel
+     * @param {Eris.Message} message Discord message
+     * @param {Eris.Message} text Text after the command
+     * @param {string[]} args Discord message
+     */
+    baseCmd: async (bot, message, text, args) => {
+        const dest = ['the CIA', 'the KGB', 'Moscow', 'Microsoft', 'Google Ads', 'a nigerian prince', 'a russian hacker', 'your parents', 'your local scammers', 'indian tech support scammers', 'the IRS'];
+        bot.createMessage(message.channel.id, `:white_check_mark: \`Your token is ${Buffer.from(message.member.user.id).toString('base64')}.******.***************************, this will be sent to ${dest[Math.round(Math.random() * (dest.length - 1))]}.\``);
+    }
+};
+
+module.exports.lmgtfy = {
+    name: 'lmgtfy',
+    usage: 'lmgtfy [search]',
+    description: 'Send a link to lmgtfy.com with a custom search term',
+    adminOnly: false,
+    ownerOnly: false,
+    /**
+     * @param {Eris.Client} bot Text channel
+     * @param {Eris.Message} message Discord message
+     * @param {Eris.Message} text Text after the command
+     * @param {string[]} args Discord message
+     */
+    baseCmd: async (bot, message, text, args) => {
+        if (args.length < 2) {
+            message.channel.createMessage(`:no_entry: \`No text supplied!\``);
+            return;
+        }
+        bot.createMessage(message.channel.id, `https://lmgtfy.com/?q=${encodeURIComponent(text)}`);
     }
 };

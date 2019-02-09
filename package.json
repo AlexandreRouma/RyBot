@@ -13,6 +13,7 @@
     "body-parser": "^1.18.3",
     "console-control-strings": "^1.1.0",
     "eris": "^0.9.0",
+    "long-timeout": "^0.1.1",
     "math-expression-evaluator": "^1.2.17",
     "moment": "^2.22.2",
     "moment-duration-format": "^2.2.2",
@@ -21,6 +22,7 @@
     "sequelize": "^4.41.0",
     "simple-youtube-api": "^5.0.2",
     "sqlite3": "^4.0.3",
+    "uuid": "^3.3.2",
     "ytdl-core": "^0.27.1",
     "zlib-sync": "^0.1.4"
   },

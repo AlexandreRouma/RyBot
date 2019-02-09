@@ -90,3 +90,31 @@ module.exports.reload = (bot) => {
     module.exports.modules = {};
     module.exports.load(bot);
 };
+
+module.exports.getMarkdownHelp = () => {
+    let str = '';
+    let name_l = 0;
+    let alias_l = 0;
+    let usage_l = 0;
+    let perm_l = 4;
+    let desc_l = 0;
+    let cmds = module.exports.commands.length;
+    let ids = Object.keys(cmds);
+    for (let i = 0; i < ids.length; i++) {
+        let cmd = cmds[ids[i]];
+        if (cmd.name.length > name_l) {
+            name_l = cmd.name.length;
+        }
+        if (cmd.usage.length > usage_l) {
+            usage_l = cmd.usage.length;
+        }
+        if (cmd.description.length > desc_l) {
+            desc_l = cmd.description.length;
+        }
+        if (cmd.alias) {
+            if (cmd.alias.length > alias_l) {
+                alias_l = cmd.alias.length;
+            }
+        }
+    }
+};

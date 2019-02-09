@@ -2,6 +2,8 @@ const logger = require('../logger');
 const config = require('../config');
 const modHelper = require('../modHelper');
 const embedBuilder = require('../embedBuilder');
+const lt = require('long-timeout');
+const uuidv4 = require('uuid/v4');
 
 // Require Eris for synthax highlight
 // eslint-disable-next-line no-unused-vars
@@ -12,7 +14,6 @@ const PUNISHMENTS_DEFAULT = {
 };
 
 let eris_bot = {};
-let workerId = {};
 
 module.exports._mod_info = {
     name: 'moderation_commands',
@@ -24,15 +25,44 @@ module.exports._mod_init = (bot) => {
     logger.log(`Initializing moderation_commands...`);
     eris_bot = bot;
     handleTempPunishments();
-    workerId = setInterval(handleTempPunishments, config.getGlobal().tempPunishmentCheckInterval);
     logger.ok();
 };
 
 module.exports._mod_end = (bot) => {
     logger.log(`Stopping moderation_commands...`);
-    clearInterval(workerId);
     logger.ok();
 };
+
+let timers = [];
+
+function getTimerSlot(timer) {
+    let slot = uuidv4();
+    timer[slot] = timer;
+    return slot;
+}
+
+function clearTimerSlot(slot) {
+    delete timers[slot];
+}
+
+function removePunishment(punishment, memberId, serverId, conf) {
+    if (punishment.type == 'tempmute') {
+        try {
+            eris_bot.removeGuildMemberRole(serverId, memberId, conf.mutedRole, 'automatic unmute');
+        }
+        catch (err) {
+            logger.logWarn(`Could not unmute ${punishment.member.username}#${punishment.member.discriminator} on '${punishment.server.name}'.`);
+        }
+    }
+    else if (punishment.type == 'tempban') {
+        try {
+            eris_bot.unbanGuildMember(serverId, memberId, 'automatic unban');
+        }
+        catch (err) {
+            logger.logWarn(`Could not unmute ${punishment.member.username}#${punishment.member.discriminator} on '${punishment.server.name}'.`);
+        }
+    }
+}
 
 async function handleTempPunishments() {
     let punishments = await config.getOther('punishments', PUNISHMENTS_DEFAULT);
@@ -40,36 +70,45 @@ async function handleTempPunishments() {
     let now = Date.now();
     for (let i = 0; i < IDs.length; i++) {
         let punish = punishments.list[IDs[i]];
+        let id = IDs[i].split('_');
+        let memberId = id[0];
+        let serverId = id[1];
+        let conf = await config.get(serverId);
         if (new Date(punish.expiry) < now) {
-            let id = IDs[i].split('_');
-            let memberId = id[0];
-            let serverId = id[1];
-            let conf = await config.get(serverId);
-            if (punish.type == 'tempmute') {
-                try {
-                    eris_bot.removeGuildMemberRole(serverId, memberId, conf.mutedRole, 'automatic unmute');
-                }
-                catch (err) {
-                    logger.logWarn(`Could not unmute ${punish.member.username}#${punish.member.discriminator} on '${punish.server.name}'.`);
-                }
-            }
-            else if (punish.type == 'tempban') {
-                try {
-                    eris_bot.unbanGuildMember(serverId, memberId, 'automatic unban');
-                }
-                catch (err) {
-                    logger.logWarn(`Could not unmute ${punish.member.username}#${punish.member.discriminator} on '${punish.server.name}'.`);
-                }
-            }
+            removePunishment(punish, memberId, serverId, conf);
             delete punishments.list[IDs[i]];
+        }
+        else {
+            let span = new Date(punish.expiry).getTime() - now;
+            punishments.list[IDs[i]].timer = getTimerSlot(lt.setTimeout(() => {
+                removePunishment(punish, memberId, serverId, conf);
+                delete  punishments.list[`${memberId}_${serverId}_${punish.type}`];
+            }, span));
         }
     }
     config.setOther('punishments', punishments);
 }
 
 async function addTempPunishment(memberId, serverId, punishment) {
+    let conf = await config.get(serverId);
+    let span = punishment.expiry - Date.now();
     let punishments = await config.getOther('punishments', PUNISHMENTS_DEFAULT);
-    punishments.list[`${memberId}_${serverId}`] = punishment;
+    punishments.timer = getTimerSlot(lt.setTimeout(() => {
+        removePunishment(punishment, memberId, serverId, conf);
+        delete  punishments.list[`${memberId}_${serverId}_${punishment.type}`];
+    }, span));
+    punishments.list[`${memberId}_${serverId}_${punishment.type}`] = punishment;
+    config.setOther('punishments', punishments);
+}
+
+async function removePunishmentEntry(memberId, serverId, punishment) {
+    let punishments = await config.getOther('punishments', PUNISHMENTS_DEFAULT);
+    if (punishments.list[`${memberId}_${serverId}_${punishment.type}`]) {
+        let slot = punishments.list[`${memberId}_${serverId}_${punishment.type}`].timer;
+        lt.clearTimeout(timers[slot]);
+        clearTimerSlot(slot);
+        delete  punishments.list[`${memberId}_${serverId}_${punishment.type}`];
+    }
     config.setOther('punishments', punishments);
 }
 
@@ -396,6 +435,7 @@ module.exports.unmute = {
         for (let i = 0; i < mentions.length; i++) {
             try {
                 await message.channel.guild.removeMemberRole(mentions[i].id, conf.mutedRole);
+                removePunishmentEntry(message.member.id, message.channel.guild.id, { type: 'tempmute' });
             }
             catch (err)  {
                 message.channel.createMessage(`:no_entry: \`Could not unmute ${mentions[i].username}#${mentions[i].discriminator}\``);
