@@ -16,6 +16,7 @@ module.exports._mod_info = {
     name: 'misc_commands',
     description: 'Misc commands for RyBot',
     author: 'Ryzerth',
+    version: '1.0.0'
 };
 
 module.exports._mod_init = (bot) => {

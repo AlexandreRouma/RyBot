@@ -67,6 +67,7 @@ module.exports._mod_info = {
     name: 'rextester_api',
     description: 'Rextester API',
     author: 'Ryzerth',
+    version: '1.0.0'
 };
 
 module.exports._mod_init = (bot) => {

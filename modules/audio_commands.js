@@ -17,6 +17,7 @@ module.exports._mod_info = {
     name: 'audio_commands',
     description: 'Audio commands for RyBot',
     author: 'Ryzerth',
+    version: '1.0.0'
 };
 
 module.exports._mod_init = (bot) => {

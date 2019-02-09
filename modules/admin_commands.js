@@ -10,6 +10,7 @@ module.exports._mod_info = {
     name: 'admin_commands',
     description: 'Admin commands for RyBot',
     author: 'Ryzerth',
+    version: '1.0.0'
 };
 
 module.exports._mod_init = (bot) => {

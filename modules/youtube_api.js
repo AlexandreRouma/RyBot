@@ -9,6 +9,7 @@ module.exports._mod_info = {
     name: 'youtube_api',
     description: 'YouTube API',
     author: 'Ryzerth',
+    version: '1.0.0'
 };
 
 module.exports._mod_init = (bot) => {

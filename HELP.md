@@ -35,3 +35,4 @@
 | userinfo      |          | userinfo [user]                     | No    | No    | Get information about a user                        |
 | reload        |          | reload                              | No    | Yes   | Reload the bot's modules                            |
 | setstatus     |          | setstatus [text]                    | No    | Yes   | Set the bot's status                                |
+| module        |          | module [list/info] [name]           | No    | Yes   | List modules or get info about one                  |
