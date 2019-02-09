@@ -324,7 +324,7 @@ module.exports.serverinfo = {
 module.exports.aesthetics = {
     name: 'aesthetics',
     usage: 'aesthetics [text]',
-    description: 'Make text ａｅｓｔｈｅｔｉｃ',
+    description: 'Make text aesthetic',
     alias: 'vapwav',
     adminOnly: false,
     ownerOnly: false,
@@ -387,7 +387,7 @@ var leetspeak = {
 module.exports.leetspeak = {
     name: 'leetspeak',
     usage: 'leetspeak [text]',
-    description: 'Make text ａｅｓｔｈｅｔｉｃ',
+    description: 'Turn text into leetspeak',
     alias: 'leet',
     adminOnly: false,
     ownerOnly: false,

@@ -66,6 +66,7 @@ module.exports.load = (bot) => {
                 module.exports.commands[mod[funcs[j]].name] = mod[funcs[j]];
                 if (mod[funcs[j]].alias) {
                     module.exports.commands[mod[funcs[j]].alias] = mod[funcs[j]];
+                    module.exports.commands[mod[funcs[j]].alias].isAlias = true;
                 }
                 cmdCount++;
                 totalCmd++;
@@ -91,14 +92,22 @@ module.exports.reload = (bot) => {
     module.exports.load(bot);
 };
 
+function bool2YN(b) {
+    if (b) {
+        return 'Yes';
+    }
+    else {
+        return 'No ';
+    }
+}
+
 module.exports.getMarkdownHelp = () => {
     let str = '';
     let name_l = 0;
     let alias_l = 0;
     let usage_l = 0;
-    let perm_l = 4;
     let desc_l = 0;
-    let cmds = module.exports.commands.length;
+    let cmds = module.exports.commands;
     let ids = Object.keys(cmds);
     for (let i = 0; i < ids.length; i++) {
         let cmd = cmds[ids[i]];
@@ -117,4 +126,20 @@ module.exports.getMarkdownHelp = () => {
             }
         }
     }
+    str += `| Name${' '.repeat(name_l - 'Name'.length)} | Alias${' '.repeat(alias_l - 'Alias'.length)} | Usage${' '.repeat(usage_l - 'Usage'.length)} | Admin | Owner | Description${' '.repeat(desc_l - 'Description'.length)} |\n`;
+    str += `|${'-'.repeat(name_l + 2)}|${'-'.repeat(alias_l + 2)}|${'-'.repeat(usage_l + 2)}|-------|-------|${'-'.repeat(desc_l + 2)}|\n`;
+    let processed = {};
+    for (let i = 0; i < ids.length; i++) {
+        let cmd = cmds[ids[i]];
+        if (processed[cmd.name]) {
+            continue;
+        }
+        let alias = ' '.repeat(alias_l);
+        if (cmd.alias) {
+            alias = cmd.alias + ' '.repeat(alias_l - cmd.alias.length);
+        }
+        str += `| ${cmd.name + ' '.repeat(name_l - cmd.name.length)} | ${alias} | ${cmd.usage + ' '.repeat(usage_l - cmd.usage.length)} | ${bool2YN(cmd.adminOnly)}   | ${bool2YN(cmd.ownerOnly)}   | ${cmd.description + ' '.repeat(desc_l - cmd.description.length)} |\n`;
+        processed[cmd.name] = true;
+    }
+    return str;
 };

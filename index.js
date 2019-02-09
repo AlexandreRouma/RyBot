@@ -2,6 +2,7 @@ const logger = require('./logger');
 const config = require('./config');
 const Eris = require('eris');
 const modHelper = require('./modHelper');
+const fs = require('fs');
 
 let bot = new Eris.Client();
 
@@ -52,6 +53,11 @@ async function main() {
 
     // Load modules
     modHelper.load(bot);
+
+    // Generate help file
+    logger.log('Generating help file...');
+    fs.writeFileSync('HELP.md', modHelper.getMarkdownHelp());
+    logger.ok();
 
     // Handlers
     logger.log('Starting handlers...');
