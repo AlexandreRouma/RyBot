@@ -32,8 +32,8 @@ async function main() {
                     'TYPING_START': true,
                 },
                 compress: true,
-                disableEveryone: false,
-                getAllUsers: true
+                disableEveryone: true,
+                getAllUsers: true,
             });
             bot.connect();
         }
@@ -67,7 +67,7 @@ async function main() {
             let args = fullMsg.split(' ');
             let cmd = modHelper.commands[args[0]];
             if (!cmd) {
-                await message.channel.createMessage(`:no_entry: \`Unknown command: ${args[0]}\``);
+                await message.channel.createMessage(`:no_entry: \`Unknown command: ${args[0].replace(/`/, '').replace(/@/, '')}\``);
                 return;
             }
             let subCmd;

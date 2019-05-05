@@ -24,7 +24,7 @@ module.exports._mod_init = (bot) => {
     logger.log(`Initializing audio_commands...`);
     if (!fs.existsSync(`${config.getGlobal().modules}/youtube_api.js`)) {
         logger.failed();
-        return 'Unmet dependency: rextester_api';
+        return 'Unmet dependency: youtube_api';
     }
     momentDurationFormatSetup(moment);
     logger.ok();
