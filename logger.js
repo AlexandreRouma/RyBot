@@ -2,7 +2,7 @@ const moment = require('moment');
 const consoleControl = require('console-control-strings');
 
 module.exports.log = (str) => {
-    process.stdout.write(`[        ] [${moment().format('DD-MM-YY HH:MM:ss')}] - ${str}`);
+    process.stdout.write(`[        ] [${moment().format('DD-MM-YY HH:mm:ss')}] - ${str}`);
 };
 
 module.exports.panic = (str) => {
@@ -29,17 +29,17 @@ module.exports.info = () => {
 
 // Pre print
 module.exports.logOk = (str) => {
-    process.stdout.write(`[   ${consoleControl.color('green')}OK${consoleControl.color('reset')}   ] [${moment().format('DD-MM-YY HH:MM:ss')}] - ${str}\n`);
+    process.stdout.write(`[   ${consoleControl.color('green')}OK${consoleControl.color('reset')}   ] [${moment().format('DD-MM-YY HH:mm:ss')}] - ${str}\n`);
 };
 
 module.exports.logFailed = (str) => {
-    process.stdout.write(`[ ${consoleControl.color('red')}FAILED${consoleControl.color('reset')} ] [${moment().format('DD-MM-YY HH:MM:ss')}] - ${str}\n`);
+    process.stdout.write(`[ ${consoleControl.color('red')}FAILED${consoleControl.color('reset')} ] [${moment().format('DD-MM-YY HH:mm:ss')}] - ${str}\n`);
 };
 
 module.exports.logWarn = (str) => {
-    process.stdout.write(`[  ${consoleControl.color('yellow')}WARN${consoleControl.color('reset')}  ] [${moment().format('DD-MM-YY HH:MM:ss')}] - ${str}\n`);
+    process.stdout.write(`[  ${consoleControl.color('yellow')}WARN${consoleControl.color('reset')}  ] [${moment().format('DD-MM-YY HH:mm:ss')}] - ${str}\n`);
 };
 
 module.exports.logInfo = (str) => {
-    process.stdout.write(`[  ${consoleControl.color('blue')}INFO${consoleControl.color('reset')}  ] [${moment().format('DD-MM-YY HH:MM:ss')}] - ${str}\n`);
+    process.stdout.write(`[  ${consoleControl.color('blue')}INFO${consoleControl.color('reset')}  ] [${moment().format('DD-MM-YY HH:mm:ss')}] - ${str}\n`);
 };

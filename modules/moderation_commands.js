@@ -29,24 +29,31 @@ module.exports._mod_init = (bot) => {
     logger.ok();
 };
 
+let timers = [];
+
 module.exports._mod_end = (bot) => {
     logger.log(`Stopping moderation_commands...`);
+    let slots = Object.keys(timers);
+    for (let i = 0; i < slots.length; i++) {
+        console.log(timers);
+        clearTimerSlot(slots[i]);
+    }
     logger.ok();
 };
 
-let timers = [];
-
 function getTimerSlot(timer) {
     let slot = uuidv4();
-    timer[slot] = timer;
+    timers[slot] = timer;
     return slot;
 }
 
 function clearTimerSlot(slot) {
+    lt.clearTimeout(timers[slot]);
     delete timers[slot];
 }
 
 function removePunishment(punishment, memberId, serverId, conf) {
+    logger.logInfo(`Removing a temporary punishment of type '${punishment.type}' from ${memberId} on ${serverId}`);
     if (punishment.type == 'tempmute') {
         try {
             eris_bot.removeGuildMemberRole(serverId, memberId, conf.mutedRole, 'automatic unmute');
@@ -91,6 +98,7 @@ async function handleTempPunishments() {
 }
 
 async function addTempPunishment(memberId, serverId, punishment) {
+    logger.logInfo(`Adding a temporary punishment of type '${punishment.type}' to ${memberId} on ${serverId}`);
     let conf = await config.get(serverId);
     let span = punishment.expiry - Date.now();
     let punishments = await config.getOther('punishments', PUNISHMENTS_DEFAULT);
@@ -112,6 +120,25 @@ async function removePunishmentEntry(memberId, serverId, punishment) {
     }
     config.setOther('punishments', punishments);
 }
+
+module.exports.flushpdb = {
+    name: 'flushpdb',
+    usage: 'flushpdb',
+    description: 'Flush the punishment database (ONLY use when database is corrupted, this removed all future punishemnt removals)',
+    adminOnly: false,
+    ownerOnly: true,
+    /**
+     * @param {Eris.Client} bot Text channel
+     * @param {Eris.Message} message Discord message
+     * @param {Eris.Message} text Text after the command
+     * @param {string[]} args Discord message
+     */
+    baseCmd: async (bot, message, text, args) => {
+        config.setOther('punishments', PUNISHMENTS_DEFAULT);
+        logger.logWarn(`The punishment database hasa been flushed, any autoremoved punishments will not occure after the next restart/reload.`);
+        message.channel.createMessage(`:white_check_mark: \`Punishment database flushed.\``);
+    }
+};
 
 module.exports.kick = {
     name: 'kick',
