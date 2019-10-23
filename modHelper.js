@@ -6,7 +6,7 @@ const https = require('https');
 module.exports.modules = {};
 module.exports.commands = {};
 module.exports.markdownHelp = '';
-module.exports.helpLink = '';
+module.exports.helpLink = ':no_entry: `No help link currently available, the hastebin API might be down :/`';
 
 let workerId = null;
 
@@ -94,9 +94,18 @@ module.exports.load = (bot) => {
 };
 
 function updateHelpLink() {
-    hastebin(module.exports.markdownHelp, (key) => {
-        module.exports.helpLink = `https://hastebin.com/${key}.md`;
-    });
+    console.logInfo('Updating help...');
+    try {
+        hastebin(module.exports.markdownHelp, (key) => {
+            if (key != null) {
+                logger.logOk('Help link updated sucessfully!');
+                module.exports.helpLink = `https://hastebin.com/${key}.md`;
+            }
+        });
+    }
+    catch (e) {
+        logger.logFailed('Couldn\'t update command list link, hastebin.com down?');
+    }
 }
 
 module.exports.reload = (bot) => {
@@ -180,7 +189,14 @@ function hastebin(text, callback) {
             data += d;
         });
         res.on('end', (d) => {
-            callback(JSON.parse(data).key);
+            let result = null;
+            try {
+                result = JSON.parse(data).key;
+            }
+            catch (e) {
+                logger.logWarn(`Couldn't get new hastebin key: ${e}`);
+            }
+            callback(result);
         });
     });
     req.on('error', (e) => {

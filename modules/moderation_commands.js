@@ -225,7 +225,7 @@ module.exports.ban = {
                 if (unit == 'y') {
                     expiry.setFullYear(expiry.getMinutes() + dur);
                 }
-                addTempPunishment(message.member.id, message.channel.guild.id, {
+                addTempPunishment(mentions[i].id, message.channel.guild.id, {
                     type: 'tempban',
                     expiry: expiry,
                     server: message.channel.guild,
@@ -417,7 +417,7 @@ module.exports.mute = {
                 if (unit == 'y') {
                     expiry.setFullYear(expiry.getMinutes() + dur);
                 }
-                addTempPunishment(message.member.id, message.channel.guild.id, {
+                addTempPunishment(mentions[i].id, message.channel.guild.id, {
                     type: 'tempmute',
                     expiry: expiry,
                     server: message.channel.guild,

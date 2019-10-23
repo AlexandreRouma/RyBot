@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Sequelize = require('sequelize');
 
-const DEFAULT_GLOBAL = {
+module.exports.DEFAULT_GLOBAL = {
     token: '',
     modules: '',
     botOwner: '274976585650536449',
@@ -9,7 +9,7 @@ const DEFAULT_GLOBAL = {
     status: '',
 };
 
-const DEFAULT_SERVER = {
+module.exports.DEFAULT_SERVER = {
     adminRole: '',
     prefix: ';',
     embedColor: '#FF0000',
@@ -43,9 +43,9 @@ function migrate(oldCnf, newCnf, remove = true) {
 
 module.exports.init = async (jsonpath, sqlitepath) => {
     if (!fs.existsSync(jsonpath)) {
-        fs.writeFileSync(jsonpath, JSON.stringify(DEFAULT_GLOBAL, undefined, 4));
+        fs.writeFileSync(jsonpath, JSON.stringify(module.exports.DEFAULT_GLOBAL, undefined, 4));
     }
-    gconfig = migrate(JSON.parse(fs.readFileSync(jsonpath)), DEFAULT_GLOBAL, false);
+    gconfig = migrate(JSON.parse(fs.readFileSync(jsonpath)), module.exports.DEFAULT_GLOBAL, false);
     fs.writeFileSync(jsonpath, JSON.stringify(gconfig, undefined, 4));
 
     sequelize = new Sequelize('', '', '', {
@@ -79,7 +79,7 @@ module.exports.setGlobal = (config) => {
 async function addServer(server) {
     await sconfig.create({
         serverId: server,
-        config: JSON.stringify(DEFAULT_SERVER)
+        config: JSON.stringify(module.exports.DEFAULT_SERVER)
     });
 }
 
@@ -90,12 +90,13 @@ module.exports.get = async (server) => {
         }
     });
     if (_config == null) {
+        console.log(`Creating new config for ${server}`);
         addServer(server);
-        return DEFAULT_SERVER;
+        return module.exports.DEFAULT_SERVER;
     }
     let config = JSON.parse(_config.get('config'));
-    if (Object.keys(config).length != Object.keys(DEFAULT_SERVER).length) {
-        config = migrate(config, DEFAULT_SERVER);
+    if (Object.keys(config).length != Object.keys(module.exports.DEFAULT_SERVER).length) {
+        config = migrate(config, module.exports.DEFAULT_SERVER);
         module.exports.set(server, config);
     }
     return config;
