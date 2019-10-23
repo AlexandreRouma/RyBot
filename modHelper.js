@@ -94,7 +94,7 @@ module.exports.load = (bot) => {
 };
 
 function updateHelpLink() {
-    console.logInfo('Updating help...');
+    logger.logInfo('Updating help...');
     try {
         hastebin(module.exports.markdownHelp, (key) => {
             if (key != null) {
